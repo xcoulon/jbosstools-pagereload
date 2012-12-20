@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            id="org.jboss.tools.web.pagereloader.observeFolderCommand"
+            name="Live Reload...">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=additions">
+         <command
+               commandId="org.jboss.tools.web.pagereloader.observeFolderCommand"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=additions">
+         <command
+               commandId="org.jboss.tools.web.pagereloader.observeFolderCommand"
+               style="push">
+            <visibleWhen
+                  checkEnabled="true">
+               <instanceof
+                     value="org.eclipse.core.resources.IFolder">
+               </instanceof>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.jboss.tools.web.pagereloader.internal.command.ObserveFolderCommandHandler"
+            commandId="org.jboss.tools.web.pagereloader.observeFolderCommand">
+      </handler>
+   </extension>
+
+</plugin>

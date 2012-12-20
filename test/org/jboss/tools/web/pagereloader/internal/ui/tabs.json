@@ -1,0 +1,22 @@
+[ {
+   "devtoolsFrontendUrl": "/devtools/devtools.html?ws=localhost:9222/devtools/page/67_2",
+   "faviconUrl": "http://help.eclipse.org/favicon.ico",
+   "thumbnailUrl": "/thumb/http://help.eclipse.org/indigo/index.jsp?topic=/org.eclipse.platform.doc.isv/guide/workbench_cmd_menus.htm",
+   "title": "Help - Eclipse Platform",
+   "url": "http://help.eclipse.org/indigo/index.jsp?topic=/org.eclipse.platform.doc.isv/guide/workbench_cmd_menus.htm",
+   "webSocketDebuggerUrl": "ws://localhost:9222/devtools/page/67_2"
+}, {
+   "devtoolsFrontendUrl": "/devtools/devtools.html?ws=localhost:9222/devtools/page/68_1",
+   "faviconUrl": "https://www.webkit.org/favicon.ico",
+   "thumbnailUrl": "/thumb/https://www.webkit.org/blog/1875/announcing-remote-debugging-protocol-v1-0/",
+   "title": "Surfin&#39; Safari - Blog Archive \u00BB Announcing Remote Debugging Protocol v1.0",
+   "url": "https://www.webkit.org/blog/1875/announcing-remote-debugging-protocol-v1-0/",
+   "webSocketDebuggerUrl": "ws://localhost:9222/devtools/page/68_1"
+}, {
+   "devtoolsFrontendUrl": "/devtools/devtools.html?ws=localhost:9222/devtools/page/99_1",
+   "faviconUrl": "https://maps.gstatic.com/favicon3.ico",
+   "thumbnailUrl": "/thumb/https://maps.google.com/",
+   "title": "Google Maps",
+   "url": "https://maps.google.com/",
+   "webSocketDebuggerUrl": "ws://localhost:9222/devtools/page/99_1"
+} ]
