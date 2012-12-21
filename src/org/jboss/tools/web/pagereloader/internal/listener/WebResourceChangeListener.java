@@ -74,7 +74,7 @@ public class WebResourceChangeListener implements IResourceChangeListener {
 		if (webappFolder.getFullPath().isPrefixOf(resource.getFullPath())) {
 			try {
 				final IPath changedPath = resource.getFullPath().makeRelativeTo(webappFolder.getFullPath());
-				String path = "http://localhost:8080/jboss-html5-webapp/" + changedPath.toString();
+				String path = "http://" + server.getHost() + ":" + server.getAttribute("org.jboss.ide.eclipse.as.core.server.webPort", "8080") + "/" + module.getName() + "/" + changedPath.toString();
 				System.out.println("Putting '" + path + "' on wait queue until server publish is done.");
 				pendingChanges.offer(path);
 			} catch (Exception e) {
