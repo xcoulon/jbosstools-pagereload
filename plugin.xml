@@ -1,44 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <!--extension
+   <extension
          point="org.eclipse.ui.commands">
       <command
-            id="org.jboss.tools.web.pagereloader.observeFolderCommand"
-            name="Live Reload...">
+            id="org.jboss.tools.web.pagereloader.enableLiveReloadCommand"
+            name="Enable Live Reload">
       </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="false"
-            locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=additions">
+            locationURI="popup:org.eclipse.wst.server.ui.ServersView">
          <command
-               commandId="org.jboss.tools.web.pagereloader.observeFolderCommand"
-               style="push">
-         </command>
-      </menuContribution>
-      <menuContribution
-            allPopups="false"
-            locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=additions">
-         <command
-               commandId="org.jboss.tools.web.pagereloader.observeFolderCommand"
+               commandId="org.jboss.tools.web.pagereloader.enableLiveReloadCommand"
                style="push">
             <visibleWhen
-                  checkEnabled="true">
-               <instanceof
-                     value="org.eclipse.core.resources.IFolder">
-               </instanceof>
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <and>
+                     <count
+                           value="1">
+                     </count>
+                     <iterate
+                           ifEmpty="false"
+                           operator="or">
+                        <instanceof
+                              value="org.eclipse.wst.server.core.IServer">
+                        </instanceof>
+                     </iterate>
+                  </and>
+               </with>
             </visibleWhen>
          </command>
       </menuContribution>
+      
    </extension>
+   
+   
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="org.jboss.tools.web.pagereloader.internal.command.ObserveFolderCommandHandler"
-            commandId="org.jboss.tools.web.pagereloader.observeFolderCommand">
+            class="org.jboss.tools.web.pagereloader.internal.command.EnableLiveReloadCommandHandler"
+            commandId="org.jboss.tools.web.pagereloader.enableLiveReloadCommand">
       </handler>
-   </extension-->
+   </extension>
 
 </plugin>

@@ -14,22 +14,18 @@ package org.jboss.tools.web.pagereloader.internal.command;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.wst.server.core.IServer;
 import org.jboss.tools.web.pagereloader.internal.listener.WebResourceChangeListener;
-import org.jboss.tools.web.pagereloader.internal.ui.BrowserTab;
-import org.jboss.tools.web.pagereloader.internal.ui.LiveReloadBrowserTabSelectionWizard;
+import org.jboss.tools.web.pagereloader.internal.remote.websocketx.WebSocketServer;
 
 /**
  * @author xcoulon
  * 
  */
-public class ObserveFolderCommandHandler extends AbstractHandler {
+public class EnableLiveReloadCommandHandler extends AbstractHandler {
 
 	/*
 	 * (non-Javadoc)
@@ -43,21 +39,17 @@ public class ObserveFolderCommandHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		Shell shell = PlatformUI.getWorkbench().getModalDialogShellProvider().getShell();
-		final LiveReloadBrowserTabSelectionWizard wizard = new LiveReloadBrowserTabSelectionWizard();
-		WizardDialog dialog = new WizardDialog(shell, wizard);
-		dialog.setMinimumPageSize(800, 450);
-		dialog.create();
-		int result = dialog.open();
-		if (result == WizardDialog.OK) {
-			IWorkbenchPart activePart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-					.getActivePart();
-			IStructuredSelection selection = (IStructuredSelection) activePart.getSite().getSelectionProvider()
-					.getSelection();
-			IFolder folder = (IFolder) selection.getFirstElement();
-			final BrowserTab selectedBrowserTab = wizard.getSelectedBrowserTab();
-			WebResourceChangeListener.observeAndNotify(folder.getFullPath(), selectedBrowserTab.getWebSocketDebuggerUrl());
-		}
+		IWorkbenchPart activePart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+				.getActivePart();
+		IStructuredSelection selection = (IStructuredSelection) activePart.getSite().getSelectionProvider()
+				.getSelection();
+		// IFolder folder = (IFolder) selection.getFirstElement();
+		final IServer server = (IServer) (selection.getFirstElement());
+		WebResourceChangeListener.enableLiveReload(server);
+		WebSocketServer webSocketServer = WebSocketServer.getInstance(true);
+		webSocketServer.start();
+
+		// must return null
 		return null;
 	}
 

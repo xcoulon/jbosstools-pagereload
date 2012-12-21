@@ -11,20 +11,23 @@
 
 package org.jboss.tools.web.pagereloader.internal.listener;
 
-import java.io.StringWriter;
-import java.net.URI;
-import java.util.HashMap;
+import java.util.concurrent.ArrayBlockingQueue;
 
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
-import org.jboss.tools.web.pagereloader.internal.remote.websocketx.WebSocketClient;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.wst.server.core.IModule;
+import org.eclipse.wst.server.core.IServer;
+import org.eclipse.wst.server.core.util.PublishAdapter;
+import org.jboss.tools.web.pagereloader.internal.remote.websocketx.WebSocketServer;
 import org.jboss.tools.web.pagereloader.internal.util.Logger;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jboss.tools.web.pagereloader.internal.util.WtpUtils;
 
 /**
  * @author xcoulon
@@ -32,39 +35,32 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class WebResourceChangeListener implements IResourceChangeListener {
 
-	/** Observed location. */
-	private final IPath observedLocation;
+	private final IServer server;
+	private final IModule module;
+	private final IFolder webappFolder;
 
-	private final WebSocketClient websocketClient;
+	private final ArrayBlockingQueue<String> pendingChanges = new ArrayBlockingQueue<String>(1000);
 
-	private final ObjectMapper mapper = new ObjectMapper(); // create once,
-															// reuse
-
-	public static void observeAndNotify(final IPath observedLocation, final String websocketDebuggingUrl) {
+	public static void enableLiveReload(final IServer server) {
 		try {
-			WebResourceChangeListener listener = new WebResourceChangeListener(observedLocation, websocketDebuggingUrl);
-			ResourcesPlugin.getWorkspace().addResourceChangeListener(listener, IResourceChangeEvent.POST_CHANGE);
+			for (IModule module : server.getModules()) {
+				final IProject project = module.getProject();
+				final IFolder webappFolder = WtpUtils.getWebappFolder(project);
+				WebResourceChangeListener listener = new WebResourceChangeListener(server, module, webappFolder);
+				ResourcesPlugin.getWorkspace().addResourceChangeListener(listener, IResourceChangeEvent.POST_CHANGE);
+			}
+
+
 		} catch (Exception e) {
-			Logger.error("Failed to register observer for " + observedLocation, e);
+			Logger.error("Failed to register observer for " + server, e);
 		}
 	}
 
-	/**
-	 * Default constructor
-	 * 
-	 * @throws Exception
-	 */
-	private WebResourceChangeListener(final IPath observedLocation, final String websocketDebuggingUrl)
-			throws Exception {
-		this.observedLocation = observedLocation;
-		// register this listener
-		websocketClient = new WebSocketClient(new URI(websocketDebuggingUrl));
-		websocketClient.open();
-	}
-
-	public void close() {
-		websocketClient.close();
-		ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
+	public WebResourceChangeListener(IServer server, IModule module, IFolder webappFolder) {
+		this.server = server;
+		this.module = module;
+		this.webappFolder = webappFolder;
+		server.addPublishListener(new PageReloadPublishAdapter());
 	}
 
 	/**
@@ -75,19 +71,12 @@ public class WebResourceChangeListener implements IResourceChangeListener {
 	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
 		final IResource resource = findChangedResource(event.getDelta());
-		if (observedLocation.isPrefixOf(resource.getFullPath())) {
+		if (webappFolder.getFullPath().isPrefixOf(resource.getFullPath())) {
 			try {
-				HashMap<String, Object> request = new HashMap<String, Object>();
-				request.put("id", Math.round(1000));
-				request.put("method", "Page.reload");
-				HashMap<String, Object> params = new HashMap<String, Object>();
-				request.put("params", params);
-				params.put("ignoreCache", true);
-				StringWriter writer = new StringWriter();
-				mapper.writeValue(writer, request);
-				writer.flush();
-				final String message = writer.getBuffer().toString();
-				websocketClient.sendMessage(message);
+				final IPath changedPath = resource.getFullPath().makeRelativeTo(webappFolder.getFullPath());
+				String path = "http://localhost:8080/jboss-html5-webapp/" + changedPath.toString();
+				System.out.println("Putting '" + path + "' on wait queue until server publish is done.");
+				pendingChanges.offer(path);
 			} catch (Exception e) {
 				Logger.error("Failed to send Page.Reload command over websocket", e);
 			}
@@ -96,7 +85,7 @@ public class WebResourceChangeListener implements IResourceChangeListener {
 	}
 
 	private IResource findChangedResource(IResourceDelta delta) {
-		if(delta.getAffectedChildren().length > 0) {
+		if (delta.getAffectedChildren().length > 0) {
 			return findChangedResource(delta.getAffectedChildren()[0]);
 		}
 		return delta.getResource();
@@ -111,7 +100,8 @@ public class WebResourceChangeListener implements IResourceChangeListener {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((observedLocation == null) ? 0 : observedLocation.toPortableString().hashCode());
+		result = prime * result
+				+ ((webappFolder.getFullPath() == null) ? 0 : webappFolder.getFullPath().toPortableString().hashCode());
 		return result;
 	}
 
@@ -132,14 +122,41 @@ public class WebResourceChangeListener implements IResourceChangeListener {
 			return false;
 		}
 		WebResourceChangeListener other = (WebResourceChangeListener) obj;
-		if (observedLocation == null) {
-			if (other.observedLocation != null) {
+		if (webappFolder.getFullPath() == null) {
+			if (other.webappFolder.getFullPath() != null) {
 				return false;
 			}
-		} else if (!observedLocation.toPortableString().equals(other.observedLocation.toPortableString())) {
+		} else if (!webappFolder.getFullPath().toPortableString()
+				.equals(other.webappFolder.getFullPath().toPortableString())) {
 			return false;
 		}
 		return true;
+	}
+
+	class PageReloadPublishAdapter extends PublishAdapter {
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.wst.server.core.util.PublishAdapter#publishFinished(org
+		 * .eclipse.wst.server.core.IServer, org.eclipse.core.runtime.IStatus)
+		 */
+		@Override
+		public void publishFinished(IServer server, IStatus status) {
+			if (!status.isOK()) {
+				return;
+			}
+			try {
+				while (!pendingChanges.isEmpty()) {
+					String changedPath = pendingChanges.take();
+					WebSocketServer.getInstance().notifyResourceChange(changedPath);
+				}
+			} catch (Exception e) {
+				Logger.error("Failed to send notifications for pending changes", e);
+			}
+		}
+
 	}
 
 }
