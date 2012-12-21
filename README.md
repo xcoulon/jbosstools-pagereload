@@ -1,4 +1,8 @@
-A PoC to demonstrate how Eclipse can use the Chrome Remote Debugging Protocol to send "Page.Reload" command (using WebSocket) to the Chrome Tab to trigger a page reload each time a resource is changed in a given project folder.
+A PoC to demonstrate how Eclipse can use communicate with 
 
-Video is on youtube: http://www.youtube.com/watch?v=nmwyUptkKHo&feature=youtu.be
+See:
+ [Livereload.com](http://livereload.com) 
+ [Livereload browser extensions](https://github.com/livereload/livereload-extensions)
+ [Livereload websockets protocol](https://github.com/mockko/livereload/blob/master/docs/WebSocketProtocol.md)
+
 
