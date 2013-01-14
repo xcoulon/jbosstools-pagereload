@@ -60,7 +60,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class WebSocketServerHandler extends SimpleChannelUpstreamHandler {
 	private static final InternalLogger logger = InternalLoggerFactory.getInstance(WebSocketServerHandler.class);
 
-	private static final String WEBSOCKET_PATH = "/websocket";
+	private static final String WEBSOCKET_PATH = "/livereload";
 
 	private WebSocketServerHandshaker handshaker;
 
@@ -86,7 +86,7 @@ public class WebSocketServerHandler extends SimpleChannelUpstreamHandler {
 		}
 
 		// Handshake
-		if (req.getUri().equals("/livereload")) {
+		if (req.getUri().equals(WEBSOCKET_PATH)) {
 			WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(
 					getWebSocketLocation(req), null, false);
 			handshaker = wsFactory.newHandshaker(req);
