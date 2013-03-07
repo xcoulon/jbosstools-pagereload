@@ -11,6 +11,6 @@
 
 /**
  * @author xcoulon
- * Handling WebSocket communication with the LiveReload browser extension
+ *
  */
-package org.jboss.tools.web.pagereloader.internal.remote.websocketx;
+package org.jboss.tools.web.pagereloader.internal.websocket;

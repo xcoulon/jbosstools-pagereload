@@ -11,46 +11,35 @@
 
 package org.jboss.tools.web.pagereloader.internal.command;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.wst.server.core.IServer;
-import org.jboss.tools.web.pagereloader.internal.listener.WebResourceChangeListener;
-import org.jboss.tools.web.pagereloader.internal.remote.websocketx.WebSocketServer;
 
 /**
+ * Utility class
  * @author xcoulon
- * 
+ *
  */
-public class EnableLiveReloadCommandHandler extends AbstractHandler {
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
+public class ServerUtils {
+	
+	/** 
+	 * Utility class: no public constructor.
 	 */
-	@Override
-	public boolean isEnabled() {
-		return super.isEnabled();
+	private ServerUtils() {
+		
 	}
-
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	
+	/**
+	 * @returns the Selected Server 
+	 */
+	public static IServer getSelectedServer() {
 		IWorkbenchPart activePart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
 				.getActivePart();
 		IStructuredSelection selection = (IStructuredSelection) activePart.getSite().getSelectionProvider()
 				.getSelection();
-		// IFolder folder = (IFolder) selection.getFirstElement();
 		final IServer server = (IServer) (selection.getFirstElement());
-		WebResourceChangeListener.enableLiveReload(server);
-		WebSocketServer webSocketServer = WebSocketServer.getInstance(true);
-		webSocketServer.start();
-
-		// must return null
-		return null;
+		return server;
 	}
 
 }

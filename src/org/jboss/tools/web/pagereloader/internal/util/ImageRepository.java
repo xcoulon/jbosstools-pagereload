@@ -14,18 +14,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
 
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.osgi.util.NLS;
 
 /**
  * @author Andre Dietisheim
@@ -79,17 +71,6 @@ public class ImageRepository {
 		final ImageDescriptor imageDescriptor = ImageDescriptor.createFromURL(imageUrl);
 		registry.put(name, imageDescriptor);
 		return imageDescriptor;
-	}
-
-	private URL createFileURL(String name, URL baseUrl) {
-		try {
-			return new URL(baseUrl, name);
-		} catch (MalformedURLException e) {
-			plugin.getLog().log(
-					new Status(IStatus.ERROR, plugin.getBundle().getSymbolicName(), NLS.bind(
-							"Could not create URL for image {0}", name), e));
-			return null;
-		}
 	}
 
 	public ImageDescriptor getImageDescriptor(String name) {
