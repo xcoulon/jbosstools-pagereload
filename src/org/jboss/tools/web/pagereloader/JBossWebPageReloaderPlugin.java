@@ -1,5 +1,9 @@
 package org.jboss.tools.web.pagereloader;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jboss.tools.web.pagereloader.internal.util.ImageRepository;
@@ -56,5 +60,10 @@ public class JBossWebPageReloaderPlugin extends AbstractUIPlugin {
 
 	public ImageDescriptor getImageDescriptor(String imageName) {
 		return imageRepository.getImageDescriptor(imageName);
+	}
+
+	public InputStream getResourceContent(String path) throws IOException {
+		final URL resource = getBundle().getResource(path);
+		return resource.openStream();
 	}
 }

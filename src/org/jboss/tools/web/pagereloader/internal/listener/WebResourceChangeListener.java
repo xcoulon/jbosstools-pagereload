@@ -11,7 +11,9 @@
 
 package org.jboss.tools.web.pagereloader.internal.listener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -39,9 +41,9 @@ import org.eclipse.wst.server.core.IServerListener;
 import org.eclipse.wst.server.core.ServerEvent;
 import org.eclipse.wst.server.core.util.PublishAdapter;
 import org.jboss.tools.web.pagereloader.JBossWebPageReloaderPlugin;
+import org.jboss.tools.web.pagereloader.internal.service.LiveReloadWebServer;
 import org.jboss.tools.web.pagereloader.internal.util.Logger;
 import org.jboss.tools.web.pagereloader.internal.util.WtpUtils;
-import org.jboss.tools.web.pagereloader.internal.websocket.LiveReloadWebSocketServer;
 
 /**
  * @author xcoulon
@@ -55,7 +57,7 @@ public class WebResourceChangeListener implements IResourceChangeListener, IServ
 	private final IServer server;
 	private Map<IFolder, IModule> webappFolders = new HashMap<IFolder, IModule>();
 	private final ArrayBlockingQueue<String> pendingChanges = new ArrayBlockingQueue<String>(1000);
-	private final LiveReloadWebSocketServer liveReloadServer;
+	private final LiveReloadWebServer liveReloadServer;
 
 	public static void enableLiveReload(final IServer server) {
 		try {
@@ -105,7 +107,11 @@ public class WebResourceChangeListener implements IResourceChangeListener, IServ
 	 */
 	private WebResourceChangeListener(IServer server) throws Exception {
 		this.server = server;
-		liveReloadServer = new LiveReloadWebSocketServer();
+		final List<String> modulePaths = new ArrayList<String>(); server.getModules();
+		for(IModule module : server.getModules()) {
+			modulePaths.add(module.getName());
+		}
+		liveReloadServer = new LiveReloadWebServer();
 		server.addPublishListener(new PageReloadPublishAdapter());
 	}
 
