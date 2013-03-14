@@ -5,7 +5,7 @@
          point="org.eclipse.ui.commands">
       <command
             id="org.jboss.tools.web.pagereloader.liveReloadCommand"
-            name="Live Reload">
+            name="LiveReload...">
          <state
                id="org.eclipse.ui.commands.toggleState">
             <class
@@ -58,7 +58,7 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="org.jboss.tools.web.pagereloader.internal.command.LiveReloadCommandHandler"
+            class="org.jboss.tools.livereload.internal.command.LiveReloadCommandHandler"
             commandId="org.jboss.tools.web.pagereloader.liveReloadCommand">
           <enabledWhen>
             <with variable="selection">
@@ -74,12 +74,15 @@
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-            class="org.jboss.tools.web.pagereloader.internal.command.LiveReloadPropertyTester"
+            class="org.jboss.tools.livereload.internal.command.LiveReloadPropertyTester"
             id="org.jboss.tools.web.pagereloader.liveReloadPropertyTester"
             namespace="org.jboss.tools.web.pagereloader"
             properties="serverStarted"
             type="org.eclipse.jface.viewers.ITreeSelection">
       </propertyTester> 
+   </extension>
+   <extension
+         point="org.eclipse.wst.server.ui.editorPages">
    </extension>
 
 </plugin>

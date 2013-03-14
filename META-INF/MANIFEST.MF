@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Webpage Reloader
-Bundle-SymbolicName: org.jboss.tools.web.pagereloader;singleton:=true
+Bundle-SymbolicName: org.jboss.tools.livereload;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: org.jboss.tools.web.pagereloader.JBossWebPageReloaderPlugin
+Bundle-Activator: org.jboss.tools.livereload.internal.LiveReloadActivator
 Bundle-Vendor: JBoss by Red Hat
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -28,7 +28,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jetty.http;bundle-version="8.1.9",
  org.eclipse.jetty.io;bundle-version="8.1.9",
  org.apache.commons.io;bundle-version="2.0.1",
- org.eclipse.jetty.continuation;bundle-version="8.1.9"
+ org.eclipse.jetty.continuation;bundle-version="8.1.9",
+ org.jboss.tools.common;bundle-version="3.4.0",
+ org.jboss.tools.common.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
@@ -36,4 +38,4 @@ Bundle-ClassPath: .,
  lib/jackson-core-2.1.2.jar,
  lib/jackson-databind-2.1.2.jar,
  lib/jericho-html-3.3.jar
-Export-Package: org.jboss.tools.web.pagereloader.internal.service;x-friends:="org.jboss.tools.web.pagereloader.test"
+Export-Package: org.jboss.tools.livereload.internal.io;x-friends:="org.jboss.tools.livereload.test"
